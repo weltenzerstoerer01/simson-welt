@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -138,6 +137,18 @@ main {
 section {
     padding: 55px 0;
 }
+
+/* Die Inhalte funktionieren wie einzelne Seiten statt als lange Scroll-Seite. */
+.page-hidden {
+    display: none !important;
+}
+.hero-hidden {
+    display: none !important;
+}
+nav {
+    position: relative;
+}
+
 
 .label {
     color: #a8d52a;
@@ -371,12 +382,12 @@ footer {
         </button>
         <div class="menu-panel" id="menuPanel">
             <div class="menu-heading">SEITENMENÜ</div>
-            <a href="#start" onclick="closeMenu()">Startseite</a>
-            <a href="#geschichte" onclick="closeMenu()">Geschichte von Simson</a>
-            <a href="#modelle" onclick="closeMenu()">Modellkatalog</a>
-            <a href="#zeitlinie" onclick="closeMenu()">Historische Zeitleiste</a>
-            <a href="#shops" onclick="closeMenu()">Ersatzteile &amp; Tuning-Shops</a>
-            <a href="#quelle" onclick="closeMenu()">Quellen &amp; weiterführende Infos</a>
+            <a href="#start" onclick="navigatePage(event, 'start')">Startseite</a>
+            <a href="#geschichte" onclick="navigatePage(event, 'geschichte')">Geschichte von Simson</a>
+            <a href="#modelle" onclick="navigatePage(event, 'modelle')">Modellkatalog</a>
+            <a href="#zeitlinie" onclick="navigatePage(event, 'zeitlinie')">Historische Zeitleiste</a>
+            <a href="#shops" onclick="navigatePage(event, 'shops')">Ersatzteile &amp; Tuning-Shops</a>
+            <a href="#quelle" onclick="navigatePage(event, 'quelle')">Quellen &amp; weiterführende Infos</a>
         </div>
     </div>
 </nav>
@@ -389,7 +400,7 @@ footer {
         Von der Schwalbe über die S50 bis zur S51 Enduro.
         Mit technischen Daten, Besonderheiten und spannenden Fakten.
     </p>
-    <a href="#modelle" class="button">Modelle entdecken ↓</a>
+    <a href="#modelle" class="button" onclick="navigatePage(event, 'modelle')">Modelle entdecken ↓</a>
 </div>
 </header>
 
@@ -589,6 +600,29 @@ function closeMenu() {
     panel.classList.remove("open");
     button.setAttribute("aria-expanded", "false");
     button.setAttribute("aria-label", "Menü öffnen");
+}
+
+// Wechselt zwischen den Inhaltsseiten, ohne dass man durch die Website scrollen muss.
+function navigatePage(event, pageId) {
+    if (event) event.preventDefault();
+
+    const hero = document.querySelector(".hero");
+    const sections = document.querySelectorAll("main > section");
+
+    // Startseite zeigt nur den Begrüßungsbereich.
+    if (pageId === "start") {
+        hero.classList.remove("hero-hidden");
+        sections.forEach(section => section.classList.add("page-hidden"));
+    } else {
+        hero.classList.add("hero-hidden");
+        sections.forEach(section => {
+            section.classList.toggle("page-hidden", section.id !== pageId);
+        });
+    }
+
+    closeMenu();
+    history.replaceState(null, "", "#" + pageId);
+    window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 document.addEventListener("click", function(event) {
@@ -1296,6 +1330,9 @@ function filterModels() {
 }
 
 createModels();
+
+// Beim Laden immer auf der Startseite beginnen.
+navigatePage(null, "start");
 
 </script>
 
